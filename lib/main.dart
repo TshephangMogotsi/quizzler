@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizzler/quiz_brain.dart';
 
 void main() => runApp(const Quizzler());
 
@@ -33,11 +34,7 @@ class _QuizPageState extends State<QuizPage> {
 
   int questionNumber = 0;
 
-  List<String> questions = [
-    'You can lead a cow down stairs but not up stairs.',
-    'Approximately one quarter of human bones are in the feet.',
-    'A slug\'s blood is green.',
-  ];
+  
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +48,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: const EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                questions[questionNumber],
+                questionBank[questionNumber].questionText,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 25.0,
@@ -75,6 +72,15 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
+                bool correctAnswer =
+                    questionBank[questionNumber].questionAnswer;
+
+                if (correctAnswer) {
+                  print("Correct");
+                } else {
+                  print("Wrong");
+                }
+
                 setState(() {
                   questionNumber++;
                   scoreKeeper.add(
@@ -104,7 +110,15 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                //The user picked false.
+                bool correctAnswer =
+                    questionBank[questionNumber].questionAnswer;
+
+                if (correctAnswer) {
+                  print("Correct");
+                } else {
+                  print("Wrong");
+                }
+                
                 setState(() {
                   questionNumber++;
                   scoreKeeper.add(
