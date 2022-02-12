@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzler/quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() => runApp(const Quizzler());
 
@@ -30,11 +31,55 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
-  List<Widget> scoreKeeper = [];
+  List<Icon> scoreKeeper = [];
+
+  void checkAnswer(bool userAnswer) {
+    bool correctAnswer = quizBrain.getCorrectAnswer();
+
+    setState(() {
+      if (quizBrain.isFinished()) {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "Game Complete",
+          desc: "You have reached the end of the game.",
+          buttons: [
+            DialogButton(
+              child: const Text(
+                "Restart",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  quizBrain.reset();
+                  scoreKeeper = [];
+                });
+              },
+              width: 120,
+            )
+          ],
+        ).show();
+      } else {
+        if (userAnswer == correctAnswer) {
+          scoreKeeper.add(const Icon(
+            Icons.check,
+            color: Colors.green,
+          ));
+        } else {
+          scoreKeeper.add(const Icon(
+            Icons.close,
+            color: Colors.red,
+          ));
+        }
+        quizBrain.nextQuestion();
+      }
+    });
+  }
 
   int questionNumber = 0;
 
-  
+  QuizBrain quizBrain = QuizBrain();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +93,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: const EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                questionBank[questionNumber].questionText,
+                quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 25.0,
@@ -72,26 +117,7 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                bool correctAnswer =
-                    questionBank[questionNumber].questionAnswer;
-
-                if (correctAnswer) {
-                  print("Correct");
-                } else {
-                  print("Wrong");
-                }
-
-                setState(() {
-                  questionNumber++;
-                  scoreKeeper.add(
-                    const Icon(
-                      Icons.check,
-                      color: Colors.green,
-                    ),
-                  );
-                });
-
-                //The user picked true.
+                checkAnswer(true);
               },
             ),
           ),
@@ -110,24 +136,7 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                bool correctAnswer =
-                    questionBank[questionNumber].questionAnswer;
-
-                if (correctAnswer) {
-                  print("Correct");
-                } else {
-                  print("Wrong");
-                }
-                
-                setState(() {
-                  questionNumber++;
-                  scoreKeeper.add(
-                    const Icon(
-                      Icons.close,
-                      color: Colors.red,
-                    ),
-                  );
-                });
+                checkAnswer(false);
               },
             ),
           ),
@@ -135,14 +144,7 @@ class _QuizPageState extends State<QuizPage> {
         Row(
           children: scoreKeeper,
         )
-        //TODO: Add a Row here as your score keeper
       ],
     );
   }
 }
-
-/*
-question1: 'You can lead a cow down stairs but not up stairs.', false,
-question2: 'Approximately one quarter of human bones are in the feet.', true,
-question3: 'A slug\'s blood is green.', true,
-*/
